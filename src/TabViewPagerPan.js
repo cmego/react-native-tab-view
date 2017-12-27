@@ -117,7 +117,10 @@ export default class TabViewPagerPan<T: *> extends React.Component<Props<T>> {
     return (
       this._isMovingHorizontally(evt, gestureState) &&
       ((gestureState.dx >= DEAD_ZONE && index >= 0) ||
-        (gestureState.dx <= -DEAD_ZONE && index <= routes.length - 1))
+        (gestureState.dx <= -DEAD_ZONE && index <= routes.length - 1)) &&
+      (typeof this.props.shouldHandleGesture === 'function' ? 
+        (this.props.shouldHandleGesture(evt.nativeEvent.locationX, evt, gestureState)) :
+        (evt.nativeEvent.locationX < 50 || evt.nativeEvent.locationX > screenWidth - 50))
     );
   };
 
@@ -133,18 +136,32 @@ export default class TabViewPagerPan<T: *> extends React.Component<Props<T>> {
 
   _respondToGesture = (evt: GestureEvent, gestureState: GestureState) => {
     const { navigationState: { routes, index } } = this.props;
+
+    console.log(this.props.children[0].key,
+      (
+        (this.startingX &&
+          ((gestureState.dx > 0 && this.startingX > 50) ||
+          (gestureState.dx < 0 && this.startingX < screenWidth - 50)))
+      ),
+      this.startingX, gestureState.dx
+    );
+
     if (
       // swiping left
       (gestureState.dx > 0 && index <= 0) ||
       // swiping right
       (gestureState.dx < 0 && index >= routes.length - 1) ||
-      (this.startingX &&
-        ((gestureState.dx > 0 && this.startingX > 50) ||
-        (gestureState.dx < 0 && this.startingX < screenWidth - 50)))
+      (this.startingX && (typeof this.props.shouldHandleGesture === 'function' ? 
+        !this.props.shouldHandleGesture(this.startingX, evt, gestureState) :
+        (
+          (gestureState.dx > 0 && this.startingX > 50) ||
+          (gestureState.dx < 0 && this.startingX < screenWidth - 50)
+        )
+      ))
     ) {
       return;
     }
-
+    
     this.props.panX.setValue(gestureState.dx);
   };
 
@@ -155,9 +172,14 @@ export default class TabViewPagerPan<T: *> extends React.Component<Props<T>> {
       swipeDistanceThreshold = layout.width / 1.75,
     } = this.props;
 
-    if (this.startingX &&
-      ((gestureState.dx > 0 && this.startingX > 50) ||
-      (gestureState.dx < 0 && this.startingX < screenWidth - 50))
+    if (
+      this.startingX && (typeof this.props.shouldHandleGesture === 'function' ? 
+        !this.props.shouldHandleGesture(this.startingX, evt, gestureState) :
+        (
+          (gestureState.dx > 0 && this.startingX > 50) ||
+          (gestureState.dx < 0 && this.startingX < screenWidth - 50)
+        )
+      )
     ) {
       this.startingX = undefined;
       return;
