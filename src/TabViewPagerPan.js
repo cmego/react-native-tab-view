@@ -137,15 +137,6 @@ export default class TabViewPagerPan<T: *> extends React.Component<Props<T>> {
   _respondToGesture = (evt: GestureEvent, gestureState: GestureState) => {
     const { navigationState: { routes, index } } = this.props;
 
-    console.log(this.props.children[0].key,
-      (
-        (this.startingX &&
-          ((gestureState.dx > 0 && this.startingX > 50) ||
-          (gestureState.dx < 0 && this.startingX < screenWidth - 50)))
-      ),
-      this.startingX, gestureState.dx
-    );
-
     if (
       // swiping left
       (gestureState.dx > 0 && index <= 0) ||
