@@ -119,8 +119,8 @@ export default class TabViewPagerPan<T: *> extends React.Component<Props<T>> {
       ((gestureState.dx >= DEAD_ZONE && index >= 0) ||
         (gestureState.dx <= -DEAD_ZONE && index <= routes.length - 1)) &&
       (typeof this.props.shouldHandleGesture === 'function' ? 
-        (this.props.shouldHandleGesture(evt.nativeEvent.locationX, evt, gestureState)) :
-        (evt.nativeEvent.locationX < 50 || evt.nativeEvent.locationX > screenWidth - 50))
+        (this.props.shouldHandleGesture(evt.nativeEvent.pageX, evt, gestureState)) :
+        (evt.nativeEvent.pageX < 50 || evt.nativeEvent.pageX > screenWidth - 50))
     );
   };
 
@@ -129,7 +129,7 @@ export default class TabViewPagerPan<T: *> extends React.Component<Props<T>> {
       this.props.onSwipeStart(evt, gestureState);
     }
 
-    this.startingX = evt.nativeEvent.locationX || gestureState.x0;
+    this.startingX = evt.nativeEvent.pageX || gestureState.x0;
 
     this.props.panX.stopAnimation();
   };
